@@ -31,11 +31,11 @@ So for example, the transition
         START,_ START,_,>
         
 Says:
-  1) If the current state is START
-  2) And the current character the tape head is on is a _ (a space)
-  3) Change state to START
-  4) Replace the space with a space
-  5) Move the tape head to the right
+	1) If the current state is START
+  	2) And the current character the tape head is on is a _ (a space)
+  	3) Change state to START
+	4) Replace the space with a space
+  	5) Move the tape head to the right
   
 Transition elements can be delimited with commas or spaces (or both, as in the case of the example above).  Multiple spaces can be used as a single delimiter.  If you use commas as a delimiter, you can't have a space between the comma and the transition element.
 
