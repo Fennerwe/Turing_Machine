@@ -1,0 +1,130 @@
+div#simulator {
+	position:relative;
+	bottom:0px;
+	height:800px;
+	background-color:#e0e0e0;
+	border-color:#bbbbbb;
+}
+
+div#simulator p {
+	font-size:18px;
+	margin-bottom:5px;
+}
+
+div.label_above > *{
+	display:block;
+}
+
+div.label_left > *{
+	display:inline;
+	vertical-align:middle;
+}
+
+div#simulator > * {
+	position:absolute;
+}
+
+#tape_canvas, #tape_text_canvas {
+	width:890px;
+	height:150px;
+	top:44px;
+	left:5px;
+}
+
+#start_stop {
+	top:5px;
+	left:5px;
+}
+
+#pause_resume {
+	top:5px;
+	left:65px;
+}
+
+#step {
+	top:5px;
+	left:135px;
+}
+
+#speed {
+	top:5px;
+	right:5px;
+}
+
+#preset_program {
+	top:5px;
+	left:200px;
+}
+
+#load {
+	top:200px;
+	left:5px;
+	width:204px;
+}
+
+#download {
+	bottom:5px;
+	right:5px;
+}
+
+#import {
+	bottom:5px;
+	left:144px;
+}
+
+#string {
+	top:200px;
+	right:5px;
+}
+
+#transition_table {
+	top:245px;
+	left:5px;
+	height:auto;
+}
+
+#output {
+	top:245px;
+	right:5px;
+	height:auto;
+}
+
+#output_area, #input_tt {
+		font-family:"Courier New", Courier, monospace !important;
+}
+
+textarea {
+	resize:none;
+	font-size:18px !important;
+}
+
+.btn-inverse {
+	color:#eee;
+	background-color:#080808;
+	border-color:#222;
+}
+
+#simulator select {
+	font-size:17px;
+	text-align:center;
+}
+
+#input_string {
+	overflow-y:hidden;
+}
+
+#clear {
+	bottom:5px;
+	right:100px;
+}
+
+@-moz-document url-prefix() {
+	#input_string {
+		height:1.3em;
+		width:31.6em;
+	}
+	
+	#input_tt, #output_area {
+		height:26em;
+	}
+}

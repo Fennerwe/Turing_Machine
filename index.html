@@ -1,0 +1,70 @@
+<!doctype html>
+<html>
+<head>
+	<title>Turing Machine</title>
+	<meta charset='utf-8'>
+	<meta name='author' content='Trey Fenner'>
+	<meta name='date' content='Spring 2014'>
+	<meta name='description' content='Awesome Turing Machine simulator.'>
+	<link rel='stylesheet' type='text/css' href='css/main.css'>
+	<link rel='stylesheet' type='text/css' href='css/bootstrap.min.css'>
+		<link rel='stylesheet' type='text/css' href='css/turing.css'>
+	<script type='text/javascript' src='js/jquery-2.1.0.min.js'></script>
+	<script type='text/javascript' src='js/bootstrap.min.js'></script>
+	<script type='text/javascript' src='js/turing.js'></script>
+</head>
+
+<body>
+	<div id='main_content'>
+		<div id='content'>
+			<h1 id='header'>Turing Machine Simulator</h1>
+			<div id='simulator' class='well'>
+				<canvas id='tape_canvas' width='890' height='150'>Canvas not supported in your browser. Update! &gt;.&lt;</canvas>
+				<canvas id='tape_text_canvas' width='890' height='150'>Canvas not supported in your browser. Update! &gt;.&lt;</canvas>
+				<div id='speed' class='label_left'>
+					<p>Select a speed:</p>
+					<select id='speed_select'>
+						<option value='750'>Slow</option></br>
+						<option value='500' selected>Medium</option></br>
+						<option value='250'>Fast</option></br>
+						<option value='100'>Very Fast</option></br>
+						<option value='1'>Compute</option></br>
+					</select>
+				</div>
+				<div id='preset_program' class='label_left'>
+					<p>Load a preset program (if desired):</p>
+					<select id='preset_program_select'>
+						<option value='-1'>&lt;&lt;None&gt;&gt;</option>
+						<option value='0'>Palindrome Detector</option>
+						<option value='1'>Subtractor</option>
+						<option value='2'>Busy Beaver(5-state)</option>
+					</select>
+				</div>
+				<div id='transition_table' class='label_above'>
+					<p>Transition Table:</p>
+					<textarea class='required' id='input_tt' rows='19' cols='17'></textarea>
+				</div>
+				<div id='string' class='label_left'>
+					<p>Input String:</p>
+					<textarea class='required' id='input_string' rows='1' cols='70'></textarea>
+				</div>
+				<div id='output' class='label_above'>
+					<p>Output:</p>
+					<textarea id='output_area' rows='19' cols='60' readonly></textarea>
+				</div>
+				<button class='btn btn-inverse' id='load' onClick='loadTM()' disabled='disabled'>Load Program</button>
+				<button class='btn btn-inverse action-btn' id='start_stop' onClick='start()' disabled='disabled'>Start</button>
+				<button class='btn btn-inverse action-btn' id='pause_resume' onClick='pause_resume()' disabled='disabled'>Pause</button>
+				<button class='btn btn-inverse action-btn' id='step' onClick='step()' disabled='disabled'>Step</button>
+				<button class='btn btn-inverse' id='download' onClick='downloadOutput()' disabled='disabled'>Download</button>
+				<button class='btn btn-inverse' id='import' onClick='import()'>Import</button>
+				<button class='btn btn-inverse' id='clear' onClick='clearOutput()'>Clear Output</button>
+			</div>
+		</div>
+		<div id='footer'>
+			<p id='footer_text'>Turing Machine simulator developed for Dr. Parks' <a href='http://cs.appstate.edu/~dap/classes/2490/'>CS 2490 - Introduction to Theoretical Computer Science</a>
+			class.  Developed in whole by Trey Fenner.  Based by work done by <a href='http://ironphoenix.org/tril/'>Suzanne Britton</a>.</p>
+		</div>
+	</div>
+</body>
+</html>
