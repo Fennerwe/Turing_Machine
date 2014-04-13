@@ -30,7 +30,7 @@ So for example, the transition
 
         START,_ START,_,>
         
-Says:
+
 If the current state is START
 And the current character the tape head is on is a _ (a space)
 Change state to START
