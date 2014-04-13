@@ -42,4 +42,6 @@ Transition elements can be delimited with commas or spaces (or both, as in the c
 
 The only hard requirements for every state transition table is the first state MUST be named START, and the halt state MUST be named HALT; other than that, states can have any name.
 
+As another note, the underscore character '_' is used in the state transition table to denote a space character ' '.  Spaces are fine in the input string field, but would obviously cause issues in the transition table since a space is a valid delimiter.
+
 If you want to download this and play with it yourself, keep in mind that pre-defined programs are loaded by the page with a GET request, so they won't work on a local machine.
