@@ -9,17 +9,17 @@ The project was developed over the course of my final semester as a Computer Sci
 
 The layout for the pre-defined programs (Palindrome Detector, Subtractor, etc.) is the input string on the first line of the file followed by a single state transition on each line after.  I use .txt files, and haven't had any problems thus far.  I'll show the Subtractor program as an example:
 
-111111-1111=            The input string for the program
-START,_  START,_,>      First transition in the transition table
-START,1  START,1,>                     ^
-START,_  START,_,>                     |
-START,=  2,_,<                         |
-2,1  3,=,<                             |
-3,-  HALT,_,<                          |
-3,1  3,1,<                             |
-3,-  4,-,<                             |
-4,_  4,_,<                             v
-4,1  START,_,>          Last transition in the transition table
+        111111-1111=            The input string for the program
+        START,_  START,_,>      First transition in the transition table
+        START,1  START,1,>                     ^
+        START,_  START,_,>                     |
+        START,=  2,_,<                         |
+        2,1  3,=,<                             |
+        3,-  HALT,_,<                          |
+        3,1  3,1,<                             |
+        3,-  4,-,<                             |
+        4,_  4,_,<                             v
+        4,1  START,_,>          Last transition in the transition table
 
 
 Transitions are set up as follows:
