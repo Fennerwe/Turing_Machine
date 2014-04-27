@@ -89,8 +89,23 @@ div#simulator > * {
 	height:auto;
 }
 
+#output p {
+	display:inline;
+	padding-bottom:7px;
+}
+
 #output_area, #input_tt {
 		font-family:"Courier New", Courier, monospace !important;
+}
+
+#output_area {
+	margin-top:5px;
+}
+
+#diagram_holder {
+	margin-top:5px;
+	display:none;
+	border:1px solid #000000;
 }
 
 textarea {
@@ -116,6 +131,23 @@ textarea {
 #clear {
 	bottom:5px;
 	right:100px;
+}
+
+.label_tab {
+	border-top-left-radius:5px;
+	border-top-right-radius:5px;
+	border-top:2px solid #666666;
+	border-left:2px solid #666666;
+	border-right:2px solid #666666;
+}
+
+.label_tab:hover {
+	cursor:pointer;
+}
+
+.tab_selected {
+	color:#ececec;
+	background-color:#666666;
 }
 
 @-moz-document url-prefix() {

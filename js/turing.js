@@ -3,7 +3,7 @@ var tape;
 var inputCheckInterval;
 var outputString;
 var tapeInterval;
-var speed = 750;
+var speed = 500;
 var running = false;
 var currState;
 var numberOfTransitions;
@@ -11,15 +11,23 @@ var drawTimer;
 var ctx, text_ctx;
 var CANVAS_WIDTH = 890;
 var CANVAS_HEIGHT = 150;
-var preloaded = false;
+var ruleMatch = new RegExp(/.+( |,).+( |,).+( |,).+( |,).+/);
 
 var USER_HALT = 0;
 var MACHINE_FINISHED = 1;
 
 var presetPrograms = ["palindrome_detector.txt", "subtractor.txt", "busy_beaver(501).txt"];
 
+var DIAGRAM_WIDTH, DIAGRAM_HEIGHT;
+
 $(document).ready(function(){
-		init();
+	var output = $('#output_area');
+	DIAGRAM_WIDTH = output.width();
+	DIAGRAM_HEIGHT = output.height();
+	$('#diagram_holder').width(DIAGRAM_WIDTH);
+	$('#diagram_holder').height(DIAGRAM_HEIGHT);
+
+	init();
 });
 
 function init(){
@@ -45,7 +53,7 @@ function init(){
 }
 
 function validateInput(){
-	if($('#input_tt').val() != "" && ($('#input_string').val() != "" || preloaded)) $('#load').removeAttr("disabled");
+	if($('#input_tt').val() != "") $('#load').removeAttr("disabled");
 	else {
 		$('#load').attr("disabled", "disabled");
 		$('.action-btn').attr("disabled", "disabled");
@@ -53,18 +61,22 @@ function validateInput(){
 }
 
 function loadTM(){
+	initScene();
+
 	numberOfTransitions = 0;
 	var inputString = $('#input_string').val();
 	var transitionTable = $('#input_tt').val();
-	initializeMachine(transitionTable, inputString);
-	//$('#output_area').append("Program loaded.\n");
-	$('#output_area').val($('#output_area').val() + "Program loaded.\n");
-	
-	$('.action-btn').removeAttr("disabled");
-	
-	currState = states["START"];
-	
-	tape.draw();
+	if(initializeMachine(transitionTable, inputString)){
+		if($('#output_area').val() != "") $('#output_area').val($('#output_area').val() + "\n----------------------------------\n");
+		$('#output_area').val($('#output_area').val() + "Program loaded.\n");
+		
+		$('.action-btn').removeAttr("disabled");
+		
+		currState = states["START"];
+		currState.sphere.material = currMaterial;
+		
+		tape.draw();
+	}
 }
 
 function initializeMachine(transitionTable, inputString){
@@ -74,6 +86,8 @@ function initializeMachine(transitionTable, inputString){
 	try {
 	for(var i = 0; i < lines.length; i++){
 		var line = lines[i];
+		line = line.replace(/ ,|, /g, ",");
+		if(!ruleMatch.test(line)) throw "Your transition table has an error at\n" + "   " + lines[i];
 		var components = line.split(/[\s+,]/);
 		
 		if(components[0] == '_') components[0] = " ";
@@ -81,33 +95,37 @@ function initializeMachine(transitionTable, inputString){
 		if(components[3] == '_') components[3] = " ";
 		
 		var state = states[components[0]] === undefined ? new State(components[0]) : states[components[0]];
-		state.addTransition(components[1], new Transition(components[2], components[3], components[4]));
+		state.addTransition(components[1], new Transition(components[1], components[2], components[3], components[4]));
 		
 		states[components[0]] = state;
 	}
 	}catch(e){
-		var text = "Something is wrong with your transition table.\nError message received was: \n\n";
-		text += e.message;
-		alert(text);
+		$('#output_area').val($('#output_area').val() + e + "\n");
+		$('#output_area').scrollTop($('#output_area')[0].scrollHeight);
+		return false;
 	}
 
 	states["HALT"] = new State("HALT");
 
 	outputString = "";
 	tape = new Tape(inputString);
+	
+	if(WEBGL_ENABLED) initializeDiagram();
+	
+	return true;
 }
 
 function start(){
 	if($('#start_stop').text() == "Start"){
 		running = true;
 
-		$('#output_area').append("Machine started...\n");
+		$('#output_area').val($('#output_area').val() + "Machine started...\n");
 		tapeInterval = setInterval(progressMachine, speed);
 		drawTimer = setInterval(tape.draw, speed);
 		$('#start_stop').text("Halt");
 	}
 	else {
-		stopMachine(USER_HALT);
+		stopMachine("User interrupted.");
 		$('#start_stop').text("Start");
 	}
 }
@@ -138,61 +156,67 @@ function step(){
 }
 
 function progressMachine(){
-		//$('#output_area').append((currState.name.length == 1 ? "0"+currState.name : currState.name) + "," + tape.printTape().trim() + '\n');
 		$('#output_area').val($('#output_area').val() + (currState.name.length == 1 ? "0"+currState.name : currState.name) + "," + tape.printTape().trim() + '\n');
 		
 		if(currState == states["HALT"]) {
-			stopMachine(MACHINE_FINISHED);
+			stopMachine("Machine finished.");
 			return;
 		};
-		var current = tape.getCurr();
-		var transition = currState.getTransition(current == "" ? " " : current);
+		
+		try {
+			var current = tape.getCurr();
+			var transition = currState.getTransition(current == "" ? " " : current);
 
-		tape.replace(transition.inputReplace);
-		if(transition.direction == '>'){
-			if(tape.hasRight() === undefined){
-				tape.addNext(new Node(" "));
+			tape.replace(transition.inputReplace);
+			if(transition.direction == '>'){
+				if(tape.hasRight() === undefined){
+					tape.addNext(new Node(" "));
+				}
+				tape.moveRight();
 			}
-			tape.moveRight();
-		}
-		else {
-			if(tape.hasLeft() === undefined){
-				tape.addPrev(new Node(" "));
+			else if(transition.direction == '<'){
+				if(tape.hasLeft() === undefined){
+					tape.addPrev(new Node(" "));
+				}
+				tape.moveLeft();
 			}
-			tape.moveLeft();
-		}
+			else if(transition.direction == '|'){}
+			else throw "Unsupported operation";
 
-		currState = states[transition.nextState];
+			currState.sphere.material = normalMaterial;
+			currState = states[transition.nextState];
+			currState.sphere.material = currMaterial;
+		}catch(e){
+			var text = "Machine crashed!\n";
+			text +=    "Current state of the machine is:\n";
+			text +=    "State: " + currState.name;
+			text +=    "\nCurrent symbol on tape: " + tape.getCurr();
+			text +=    "\nTransitions:\n"
+			for(var transName in currState.transitions){
+				var trans = currState.transitions[transName];
+				text += "   " + currState.name + "," + 
+						(trans.name == " " ? "_" : trans.name) + " " + 
+						trans.nextState + "," + 
+						(trans.inputReplace == " " ? "_" : trans.inputReplace) + "," + 
+						trans.direction + "\n";
+			}
+			stopMachine(text);
+			return;
+		}
 		
 		$('#output_area').scrollTop($('#output_area')[0].scrollHeight);
 		numberOfTransitions++;
 }
 
-function stopMachine(haltSource){
+function stopMachine(haltString){
 	clearInterval(tapeInterval);
 	clearInterval(drawTimer);
 	running = false;
 	
-	//tape.draw();
-	
-	//$('#output_area').append("\n\nMachine halted:\n");
-	$('#output_area').val($('#output_area').val() + "\n\nMachine halted:\n");
-	
-	switch(haltSource){
-		case(USER_HALT):
-			//$('#output_area').append("User interrupted\n");
-			$('#output_area').val($('#output_area').val() + "User interrupted\n");
-			break;
-		case(MACHINE_FINISHED):
-			//$('#output_area').append("Machine finished\n");
-			$('#output_area').val($('#output_area').val() + "Machine finished\n");
-			break;
-		}
-		
-	//$('#output_area').append(numberOfTransitions + " total transitions\n");
+	$('#output_area').val($('#output_area').val() + "\n\nMachine halted:\n" + haltString + "\n");
+				
 	$('#output_area').val($('#output_area').val() + numberOfTransitions + " total transitions\n");
 	var characters = tape.printTape().replace(/\[|\]|\s/g, "");
-	//$('#output_area').append(characters.length + " non-blank characters on tape\n");
 	$('#output_area').val($('#output_area').val() + characters.length + " non-blank characters on tape\n");
 	$('#output_area').scrollTop($('#output_area')[0].scrollHeight);
 	$('#download').removeAttr("disabled");
@@ -212,7 +236,6 @@ function loadPresetProgram(){
 			$('#input_tt').val(components.join("\n"));
 		});
 		$('#load').removeAttr("disabled");
-		preloaded = true;
 	}
 	else {
 		$('#input_tt').val("");
@@ -227,7 +250,26 @@ function clearOutput(){
 }
 
 function downloadOutput(){
-	download("output.txt", $('#output_area').val());
+	download($('#fileName').val()+".txt", $('#output_area').val());
+	$('#downloadModal').modal('hide');
+	$('#fileName').val("");
+}
+
+function switchTo(tab){
+	var target = $(tab).data("target");
+	if($(target).data("show")) return;
+	else {
+		var hideTarget = $('.tab_selected').data("target");
+		$(hideTarget).attr("data-show", "false");
+		$(hideTarget).hide();
+	
+		$('.tab_selected').removeClass("tab_selected");
+		$(tab).addClass("tab_selected");
+		$(target).show();
+		$(target).attr("data-show", "true");
+		if($(target).data("render")) render();
+		else cancelAnimationFrame(renderID);
+	}
 }
 
 function Node(name){
@@ -320,7 +362,7 @@ function Tape(input){
 		text_ctx.fillText(curr.name, 415, 110);
 		
 		var counter = -2;
-		while((node = node.next) !== undefined){
+		while(((node = node.next) !== undefined) && counter < 7){
 			switch(counter){
 				case -2:
 					ctx.lineWidth = 4;
@@ -353,7 +395,7 @@ function Tape(input){
 		
 		counter = -2;
 		node = curr;
-		while((node = node.prev) !== undefined){
+		while(((node = node.prev) !== undefined) && counter < 7){
 			switch(counter){
 				case -2:
 					ctx.lineWidth = 4;
@@ -386,7 +428,8 @@ function Tape(input){
 	}
 }
 
-function Transition(nextState, inputReplace, direction){
+function Transition(name, nextState, inputReplace, direction){
+	this.name = name;
 	this.nextState = nextState;
 	this.inputReplace = inputReplace;
 	this.direction = direction;
@@ -396,9 +439,19 @@ function State(name){
 	this.name = name;
 	this.transitions = new Array();
 	
+	this.sphere = new THREE.Mesh(sphereGeometry, normalMaterial);
+	this.sphere.position.set(Math.floor(Math.random()*50-25), Math.floor(Math.random()*50-25), Math.floor(Math.random()*50-25));
+	scene.add(this.sphere);
+	
+	this.sphereNextPos;
+	
 	this.addTransition = addTransition;
 	function addTransition(input, transition){
 		this.transitions[input] = transition;
+		var con;
+		var text = (input == " " ? "_" : input) + "," + (transition.inputReplace == " " ? "_" : transition.inputReplace) + "," + transition.direction;
+		if((con = cList.getConnection(this.name, transition.nextState)) != null) con.addTransitionText(text);
+		else cList.addConnection(this.name, transition.nextState, text);
 	}
 	
 	this.getTransition = getTransition;

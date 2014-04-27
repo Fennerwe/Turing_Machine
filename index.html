@@ -8,10 +8,11 @@
 	<meta name='description' content='Awesome Turing Machine simulator.'>
 	<link rel='stylesheet' type='text/css' href='css/main.css'>
 	<link rel='stylesheet' type='text/css' href='css/bootstrap.min.css'>
-		<link rel='stylesheet' type='text/css' href='css/turing.css'>
+	<link rel='stylesheet' type='text/css' href='css/turing.css'>
 	<script type='text/javascript' src='js/jquery-2.1.0.min.js'></script>
 	<script type='text/javascript' src='js/bootstrap.min.js'></script>
 	<script type='text/javascript' src='js/turing.js'></script>
+	<script type='text/javascript' src='js/Detector.js'></script>
 </head>
 
 <body>
@@ -49,14 +50,16 @@
 					<textarea class='required' id='input_string' rows='1' cols='70'></textarea>
 				</div>
 				<div id='output' class='label_above'>
-					<p>Output:</p>
-					<textarea id='output_area' rows='19' cols='60' readonly></textarea>
+					<p id='output_tab' class='label_tab tab_selected' onClick='switchTo(this)' data-target='#output_area'>Output</p>
+					<p id='diagram_tab' class='label_tab' onClick='switchTo(this)' data-target='#diagram_holder'>3D State Diagram</p>
+					<div id='diagram_holder' data-show="false" data-render="true"></div>
+					<textarea id='output_area' class='output_shown' rows='19' cols='60' data-show="true" readonly></textarea>
 				</div>
 				<button class='btn btn-inverse' id='load' onClick='loadTM()' disabled='disabled'>Load Program</button>
 				<button class='btn btn-inverse action-btn' id='start_stop' onClick='start()' disabled='disabled'>Start</button>
 				<button class='btn btn-inverse action-btn' id='pause_resume' onClick='pause_resume()' disabled='disabled'>Pause</button>
 				<button class='btn btn-inverse action-btn' id='step' onClick='step()' disabled='disabled'>Step</button>
-				<button class='btn btn-inverse' id='download' onClick='downloadOutput()' disabled='disabled'>Download</button>
+				<button class='btn btn-inverse' id='download' data-toggle='modal' data-target='#downloadModal' disabled='disabled'>Download</button>
 				<button class='btn btn-inverse' id='import' onClick='import()'>Import</button>
 				<button class='btn btn-inverse' id='clear' onClick='clearOutput()'>Clear Output</button>
 			</div>
@@ -66,5 +69,26 @@
 			class.  Developed in whole by Trey Fenner.  Based by work done by <a href='http://ironphoenix.org/tril/'>Suzanne Britton</a>.</p>
 		</div>
 	</div>
+	
+	<div class='modal fade' id='downloadModal' tabindex='-1' role='dialog' aria-labelledby='downloadLabel' aria-hidden='true'>
+		<div class='modal-dialog modal-sm'>
+			<div class='modal-content'>
+				<div class='modal-header'>
+					<button type='button' class='close' data-dismiss='modal' aria-hidden='true'>Close X</button>
+					<h4 class='modal-title' id='downloadLabel'>Download</h4>
+				</div>
+				<div class='modal-body'>
+					<label for='fileName'>Name your file:</label>
+					<input type='text' id='fileName' />
+					<button class='btn btn-inverse btn-xs' onClick='downloadOutput()'>Save</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<script type='text/javascript' src='js/three.js'></script>
+	<script type='text/javascript' src='js/OrbitControls.js'></script>
+	<script type='text/javascript' src='js/state_diagram.js'></script>
+	
 </body>
 </html>
